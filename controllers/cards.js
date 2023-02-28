@@ -58,6 +58,10 @@ module.exports.setCardLike = (req, res) => {
     })
     .then((card) => res.send(card))
     .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при постановке лайка' });
+        return;
+      }
       if (err instanceof CardNotFoundError) {
         res.status(err.statusCode).send({ message: err.message });
         return;
@@ -77,6 +81,10 @@ module.exports.deleteCardLike = (req, res) => {
     })
     .then((card) => res.send(card))
     .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при удалении лайка' });
+        return;
+      }
       if (err instanceof CardNotFoundError) {
         res.status(err.statusCode).send({ message: err.message });
         return;
