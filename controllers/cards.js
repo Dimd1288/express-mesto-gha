@@ -21,10 +21,10 @@ module.exports.getCards = (req, res) => {
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.send(card))
+    .then((card) => res.status(CREATED).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).status(CREATED).send({ message: 'Переданы некорректные данные при создании карточки' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки' });
         return;
       }
       res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' });
