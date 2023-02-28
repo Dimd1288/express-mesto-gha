@@ -3,6 +3,7 @@ const express = require('express');
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+
 const CREATED = 201;
 const NOT_FOUND = 404;
 const BAD_REQUEST = 400;
@@ -12,8 +13,8 @@ module.exports = {
   CREATED,
   NOT_FOUND,
   BAD_REQUEST,
-  SERVER_ERROR
-}
+  SERVER_ERROR,
+};
 
 const app = express();
 

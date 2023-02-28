@@ -1,5 +1,7 @@
 const Card = require('../models/card');
-const { CREATED, NOT_FOUND, BAD_REQUEST, SERVER_ERROR } = require('../app');
+const {
+  CREATED, NOT_FOUND, BAD_REQUEST, SERVER_ERROR,
+} = require('../app');
 
 class CardNotFoundError extends Error {
   constructor(message) {

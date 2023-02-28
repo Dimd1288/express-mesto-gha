@@ -1,5 +1,7 @@
 const User = require('../models/user');
-const { CREATED, NOT_FOUND, BAD_REQUEST, SERVER_ERROR } = require('../app');
+const {
+  CREATED, NOT_FOUND, BAD_REQUEST, SERVER_ERROR,
+} = require('../app');
 
 class UserNotFoundError extends Error {
   constructor(message) {
