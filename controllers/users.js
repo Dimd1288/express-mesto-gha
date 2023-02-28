@@ -30,6 +30,10 @@ module.exports.getUserById = (req, res) => {
     })
     .then((user) => res.send({ user }))
     .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
+        return;
+      }
       if (err instanceof UserNotFoundError) {
         res.status(err.statusCode).send({ message: err.message });
         return;
