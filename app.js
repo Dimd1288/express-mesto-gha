@@ -28,8 +28,8 @@ app.all('*', () => {
 
 app.use((error, req, res, next) => {
   if (error.message === 'Wrong url') {
-      res.status(404).send({ message: error.message });
-      next();
+    res.status(404).send({ message: error.message });
+    next();
   }
 });
 

@@ -10,15 +10,8 @@ class UserNotFoundError extends Error {
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .orFail(() => {
-      throw new UserNotFoundError('Пользователи не найдены');
-    })
     .then((users) => res.send(users))
-    .catch((err) => {
-      if (err instanceof UserNotFoundError) {
-        res.status(err.statusCode).send({ message: err.message });
-        return;
-      }
+    .catch(() => {
       res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
@@ -61,15 +54,10 @@ module.exports.updateUserProfile = (req, res) => {
     .orFail(() => {
       throw new UserNotFoundError('Пользователь по указанному _id не найден');
     })
-    .then((user) => {
-      if (!((req.body.name || req.body.about))) {
-        throw new Error('Переданы некорректные данные при обновлении профиля пользователя');
-      }
-      res.send(user);
-    })
+    .then((user) => res.send(user))
     .catch((err) => {
-      if (err instanceof Error) {
-        res.status(400).send({ message: err.message });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля пользователя' });
         return;
       }
       if (err instanceof UserNotFoundError) {
@@ -86,18 +74,13 @@ module.exports.updateUserAvatar = (req, res) => {
     .orFail(() => {
       throw new UserNotFoundError('Пользователь по указанному _id не найден');
     })
-    .then((user) => {
-      if (!req.body.avatar) {
-        throw new Error('Переданы некорректные данные при обновлении аватара пользователя');
-      }
-      res.send(user);
-    })
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err instanceof Error) {
-        res.status(400).send({ message: err.message });
+        res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара пользователя' });
         return;
       }
-      if (err instanceof UserNotFoundError) {
+      if (err.name === 'ValidationError') {
         res.status(err.statusCode).send({ message: err.message });
         return;
       }
