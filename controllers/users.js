@@ -83,7 +83,7 @@ module.exports.updateUserAvatar = (req, res) => {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара пользователя' });
         return;
       }
-      if (err.name === 'ValidationError') {
+      if (err instanceof UserNotFoundError) {
         res.status(err.statusCode).send({ message: err.message });
         return;
       }
