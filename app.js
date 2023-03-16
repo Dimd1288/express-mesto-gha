@@ -19,10 +19,10 @@ module.exports = {
   BAD_REQUEST,
   CONFLICT,
   SERVER_ERROR,
-  UNATHORIZED
+  UNATHORIZED,
 };
 
-module.exports.KEY = "78c2e66de7a6caee1cac2b7821c49c3b";
+module.exports.KEY = '78c2e66de7a6caee1cac2b7821c49c3b';
 
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -51,8 +51,9 @@ app.use((error, req, res, next) => {
   res.status(statusCode).send({
     message: statusCode === SERVER_ERROR
       ? 'На сервере произошла ошибка'
-      : message
+      : message,
   });
+  next();
 });
 
 app.listen(PORT);
