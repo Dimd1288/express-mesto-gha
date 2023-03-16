@@ -5,25 +5,30 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const CREATED = 201;
+const FORBIDDEN = 403;
 const NOT_FOUND = 404;
 const BAD_REQUEST = 400;
+const CONFLICT = 409;
 const SERVER_ERROR = 500;
+const UNATHORIZED = 401;
 
 module.exports = {
   CREATED,
+  FORBIDDEN,
   NOT_FOUND,
   BAD_REQUEST,
+  CONFLICT,
   SERVER_ERROR,
+  UNATHORIZED
 };
 
-const app = express();
+module.exports.KEY = "78c2e66de7a6caee1cac2b7821c49c3b";
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '63f8b14b28e55dc080fb9434',
-  };
-  next();
-});
+const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const ValidationError = require('./errors/validation-error');
+
+const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -31,18 +36,23 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.set('strictQuery', false);
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+app.post('/signin', login);
+app.post('/signup', createUser);
+
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/cards'));
 
 app.all('*', () => {
-  throw new Error('Wrong url');
+  throw new ValidationError('Wrong url');
 });
 
 app.use((error, req, res, next) => {
-  if (error.message === 'Wrong url') {
-    res.status(404).send({ message: error.message });
-    next();
-  }
+  const { statusCode = SERVER_ERROR, message } = error;
+  res.status(statusCode).send({
+    message: statusCode === SERVER_ERROR
+      ? 'На сервере произошла ошибка'
+      : message
+  });
 });
 
 app.listen(PORT);
