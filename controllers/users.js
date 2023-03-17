@@ -35,8 +35,10 @@ module.exports.createUser = (req, res, next) => {
   bcrypt.hash(password, 10).then((hash) => {
     User.create({
       name, about, avatar, email, password: hash,
-    }).select('-password')
-      .then((user) => res.status(CREATED).send({ user }))
+    })
+      .then((user) => res.status(CREATED).send({
+        name: user.name, about: user.about, avatar: user.avatar, email: user.email, _id: user._id,
+      }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
           return next(new ValidationError('Переданы некорректные данные при создании пользователя'));
@@ -82,7 +84,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  User.findUserByCredentials(email, password)
     .then((user) => {
       res.send({
         token: jwt.sign({ _id: user._id }, KEY, { expiresIn: '7d' }),
