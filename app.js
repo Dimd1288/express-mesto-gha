@@ -24,6 +24,7 @@ module.exports = {
 
 module.exports.KEY = '78c2e66de7a6caee1cac2b7821c49c3b';
 
+const { celebrate, Joi, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const ValidationError = require('./errors/validation-error');
@@ -36,8 +37,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.set('strictQuery', false);
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+}), login);
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string(),
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+}), createUser);
 
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
@@ -45,6 +60,8 @@ app.use('/cards', auth, require('./routes/cards'));
 app.all('*', () => {
   throw new ValidationError('Wrong url');
 });
+
+app.use(errors());
 
 app.use((error, req, res, next) => {
   const { statusCode = SERVER_ERROR, message } = error;
