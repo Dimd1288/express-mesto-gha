@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const { CREATED, KEY } = require('../app');
+const { CREATED, KEY } = require('../utils/constants');
 
 const NotFoundError = require('../errors/not-found-error');
 const ValidationError = require('../errors/validation-error');
@@ -48,7 +48,8 @@ module.exports.createUser = (req, res, next) => {
         }
         return next(err);
       });
-  });
+  })
+    .catch(next);
 };
 
 module.exports.updateUserProfile = (req, res, next) => {

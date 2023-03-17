@@ -3,30 +3,10 @@ const express = require('express');
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-
-const CREATED = 201;
-const FORBIDDEN = 403;
-const NOT_FOUND = 404;
-const BAD_REQUEST = 400;
-const CONFLICT = 409;
-const SERVER_ERROR = 500;
-const UNATHORIZED = 401;
-
-module.exports = {
-  CREATED,
-  FORBIDDEN,
-  NOT_FOUND,
-  BAD_REQUEST,
-  CONFLICT,
-  SERVER_ERROR,
-  UNATHORIZED,
-};
-
-module.exports.KEY = '78c2e66de7a6caee1cac2b7821c49c3b';
-
 const { celebrate, Joi, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/error-handler');
 const NotFoundError = require('./errors/not-found-error');
 
 const app = express();
@@ -57,20 +37,12 @@ app.post('/signup', celebrate({
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
 
-app.all('*', () => {
+app.all('*', auth, () => {
   throw new NotFoundError('Wrong url');
 });
 
 app.use(errors());
 
-app.use((error, req, res, next) => {
-  const { statusCode = SERVER_ERROR, message } = error;
-  res.status(statusCode).send({
-    message: statusCode === SERVER_ERROR
-      ? 'На сервере произошла ошибка'
-      : message,
-  });
-  next();
-});
+app.use(errorHandler);
 
 app.listen(PORT);

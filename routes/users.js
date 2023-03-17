@@ -3,6 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getUsers, getUserById, getCurrentUser, updateUserProfile, updateUserAvatar,
 } = require('../controllers/users');
+const { URL_REG_EXP } = require('../utils/constants');
 
 router.get('/', getUsers);
 
@@ -10,7 +11,7 @@ router.get('/me', getCurrentUser);
 
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().alphanum().length(24),
+    userId: Joi.string().length(24).hex().required(),
   }),
 }), getUserById);
 
@@ -23,7 +24,7 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(/^(https?:\/\/.)[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/),
+    avatar: Joi.string().pattern(URL_REG_EXP),
   }),
 }), updateUserAvatar);
 

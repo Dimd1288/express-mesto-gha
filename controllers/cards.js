@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 const {
   CREATED,
-} = require('../app');
+} = require('../utils/constants');
 const NotFoundError = require('../errors/not-found-error');
 const ValidationError = require('../errors/validation-error');
 const ForbiddenError = require('../errors/forbidden-error');
